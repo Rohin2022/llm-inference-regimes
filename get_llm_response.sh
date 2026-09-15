@@ -1,12 +1,16 @@
 #!/bin/bash
 set -e
 
+export NO_PROXY="localhost,127.0.0.1,::1,$NO_PROXY"
+export no_proxy="$NO_PROXY"
+
 # Start vLLM
 vllm serve ./HFCache/hub/models--allenai--OLMo-2-0425-1B-Instruct/snapshots/48d788eca847d4d7548f375ad03d3c9312f6139e \
     --host 0.0.0.0 \
     --port 8000 \
     --quantization fp8 \
     --kv-cache-dtype fp8 > vllm.log 2>&1 &
+    
 
 VLLM_PID=$!
 
