@@ -1,11 +1,6 @@
 #!/bin/bash
 set -e
 
-module load cuda12.8/toolkit/12.8.1
-
-export CUDA_HOME=$(dirname $(dirname $(which nvcc)))
-export PATH="$CUDA_HOME/bin:$PATH"
-
 export NO_PROXY="localhost,127.0.0.1,::1,$NO_PROXY"
 export no_proxy="$NO_PROXY"
 
@@ -13,11 +8,11 @@ unset HTTP_PROXY HTTPS_PROXY ALL_PROXY
 unset http_proxy https_proxy all_proxy
 
 # Start vLLM
-vllm serve /groups/bodymaps/Rohin/LMAgents/HFCache/hub/models--allenai--OLMoE-1B-7B-0924-Instruct/snapshots/7f1c97f440f06ce36705e4f2b843edb5925f4498 \
+vllm serve /groups/bodymaps/Rohin/LMAgents/HFCache/hub/models--allenai--OLMo-2-1124-7B-Instruct/snapshots/470b1fba1ae01581f270116362ee4aa1b97f4c84 \
     --host 0.0.0.0 \
     --port 8000 \
     --quantization fp8 \
-    --kv-cache-dtype fp8 > vllm_summarization.log 2>&1 &
+    --kv-cache-dtype fp8 > vllm_generation.log 2>&1 &
     
 
 VLLM_PID=$!
@@ -55,7 +50,7 @@ echo "vLLM is ready!"
 
 python run_vllm.py \
     --csv_path crs_reports_sample_fits_olmo_window.csv \
-    --output_path results/models--allenai--OLMoE-1B-7B-0924-Instruct/summarization.csv \
-    --llm_output_path results/models--allenai--OLMoE-1B-7B-0924-Instruct/summarization_outputs.jsonl \
-    --task SUMMARIZATION \
-    --max_tokens 500
+    --output_path results/models--allenai--OLMo-2-1124-7B-Instruct/generation.csv \
+    --llm_output_path results/models--allenai--OLMo-2-1124-7B-Instruct/generation_outputs.jsonl \
+    --task CREATION \
+    --max_tokens 3000

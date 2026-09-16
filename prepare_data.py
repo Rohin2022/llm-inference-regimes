@@ -4,6 +4,10 @@ from pathlib import Path
 
 import pandas as pd
 
+"""
+ python prepare_data.py /groups/bodymaps/Rohin/LMAgents/gov-report/crs
+"""
+
 
 def report_to_text(report):
     """Recursively flatten a GovReport/CRS report into a string."""
@@ -24,7 +28,6 @@ def report_to_text(report):
             add_section(subsection)
 
     add_section(report)
-
     return "\n\n".join(lines)
 
 
@@ -65,11 +68,13 @@ def main():
     parser = argparse.ArgumentParser(
         description="Load and process CRS/GovReport JSON files."
     )
+
     parser.add_argument(
         "reports_path",
         type=str,
         help="Path to directory containing CRS report JSON files",
     )
+
     args = parser.parse_args()
 
     df = load_crs_reports(args.reports_path)
@@ -78,29 +83,38 @@ def main():
     output_path = "crs_reports_parsed.csv"
     df.to_csv(output_path)
 
-    # Select reports that are at least 10x longer than their summaries
+    # Filter reports:
+    # 1. Report is at least 10x longer than summary
+    # 2. Report is <= 3500 words
+    # 3. Summary is <= 500 words
     filtered_df = df[
-        df["report_word_count"] >= 10 * df["summary_word_count"]
+        (df["report_word_count"] >= 10 * df["summary_word_count"])
+        & (df["report_word_count"] <= 2500)
+        & (df["summary_word_count"] <= 500)
     ]
 
     # Randomly sample up to 100 reports
-    sample_size = min(100, len(filtered_df))
+    sample_size = len(filtered_df)
+
     sample_df = filtered_df.sample(
         n=sample_size,
         random_state=42,
     )
 
     # Save smaller dataset
-    sample_output_path = "crs_reports_sample_100.csv"
+    sample_output_path = "crs_reports_sample_fits_olmo_window.csv"
     sample_df.to_csv(sample_output_path)
 
     print(f"Loaded {len(df)} reports")
     print(f"Saved full dataset to {output_path}")
 
     print(
-        f"Found {len(filtered_df)} reports with "
-        "report >= 10x summary length"
+        f"Found {len(filtered_df)} reports satisfying all filters:"
     )
+    print("  - report >= 10x summary length")
+    print("  - report <= 3500 words")
+    print("  - summary <= 500 words")
+
     print(f"Sampled {len(sample_df)} reports")
     print(f"Saved sample to {sample_output_path}")
 

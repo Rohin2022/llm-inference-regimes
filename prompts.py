@@ -17,20 +17,22 @@ REPORT:
 REPORT_CREATION_PROMPT = """
 Using the summary below as your source material, write a detailed,
 self-contained government-style report expanding upon the information in the
-summary. Explain the background, objectives, findings, evidence, implications,
-and recommendations in depth. Produce a coherent and detailed report rather
-than a brief summary.
+summary.
+
+Produce a comprehensive report of approximately 2,500-3,000 words. Do not
+stop after briefly restating the summary. Substantially expand the discussion
+of the background, objectives, findings, evidence, implications, and
+recommendations. Provide detailed explanations and supporting discussion for
+each major point while remaining faithful to the information in the summary.
 
 SUMMARY:
 {summary}
-
 """
 
 
-def retrieve_full_prompt(task,text):
-    if(task=="CREATION"):
-        return REPORT_CREATION_PROMPT.format(text)
-    elif(task=="SUMMARIZATION"):
-        return SUMMARIZATION_PROMPT.format(text)
-    
+def retrieve_full_prompt(task, text):
+    if task == "CREATION":
+        return REPORT_CREATION_PROMPT.format(summary=text)
+    elif task == "SUMMARIZATION":
+        return SUMMARIZATION_PROMPT.format(document=text)
     return None
