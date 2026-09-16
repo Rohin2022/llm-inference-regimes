@@ -10,11 +10,11 @@ The goal of this assignment is to investigate **when a Mixture-of-Experts model 
 
 I compare three language models with different architectures and parameter counts:
 
-| Model                               | Architecture             |             Parameters | Role                 |
+| Model | Architecture | Parameters | Role |
 | ----------------------------------- | ------------------------ | ---------------------: | -------------------- |
-| `allenai/OLMo-2-0425-1B-Instruct`   | Dense                    |                    ~1B | Small dense baseline |
-| `allenai/OLMoE-1B-7B-0924-Instruct` | Mixture-of-Experts (MoE) | ~1B active / ~7B total | MoE model            |
-| `allenai/OLMo-2-1124-7B`            | Dense                    |                    ~7B | Large dense baseline |
+| `allenai/OLMo-2-0425-1B-Instruct` | Dense | ~1B | Small dense baseline |
+| `allenai/OLMoE-1B-7B-0924-Instruct` | Mixture-of-Experts (MoE) | ~1B active / ~7B total | MoE model |
+| `allenai/OLMo-2-1124-7B` | Dense | ~7B | Large dense baseline |
 
 The three models provide comparisons across both **model size** and **active parameter count**. In particular, the MoE model has approximately 1B active parameters while containing approximately 7B total parameters, allowing its serving behavior to be compared with both the 1B dense and 7B dense models.
 
@@ -34,12 +34,19 @@ For the prefill experiment, the model receives a long GovReport document and pro
 
 ```text
 Long GovReport document
+
         │
+
         │ Many input tokens
+
         ▼
+
      PREFILL
+
         │
+
         ▼
+
    Short summary
 ```
 
@@ -58,13 +65,21 @@ For the decode experiment, the model receives a relatively short GovReport summa
 
 ```text
 Short GovReport summary
+
         │
+
         │ Relatively few input tokens
+
         ▼
+
      PREFILL
+
         │
+
         │ Long generation
+
         ▼
+
 Detailed government-style report
 ```
 
@@ -139,27 +154,68 @@ The raw measurements are retained alongside the final results so that the report
 
 ## Results
 
-The experiment produces two primary figures.
+The benchmark produces a set of visualizations covering overall performance, inference-phase timing, throughput, workload characteristics, latency distributions, scaling behavior, and the relationship between prefill and decode.
 
-### Prefill Results
+### Benchmark Dashboard
 
-The prefill experiment plots:
+The dashboard provides a compact overview of the main benchmark measurements across the three models and both workloads.
 
-**Input context length → Average tokens/second**
+![Benchmark Dashboard](results/visualizations/00_benchmark_dashboard.png)
 
-This allows comparison of how the three models' throughput changes as the input context becomes longer.
+### Phase Timing
 
-*Figure to be added.*
+Mean prefill and decode latency are shown separately for the two workloads, with 95% confidence intervals.
 
-### Decode Results
+![Inference Phase Timing](results/visualizations/01_phase_timing.png)
 
-The decode experiment plots:
+### Total Inference Time
 
-**Number of parallel generations → Average tokens/second**
+End-to-end request latency combines both prefill and decode time for each workload.
 
-This allows comparison of how the three models' aggregate throughput changes as the number of concurrent generations increases.
+![Total Inference Time](results/visualizations/02_total_time.png)
 
-*Figure to be added.*
+### Workload Token Lengths
+
+The benchmark workloads differ in their input and generated token lengths, reflecting their prefill- and decode-dominated designs.
+
+![Workload Token Lengths](results/visualizations/03_token_lengths.png)
+
+### Throughput
+
+Effective prefill and decode throughput is computed from the measured token counts and corresponding phase times.
+
+![Inference Throughput](results/visualizations/04_throughput.png)
+
+### Prefill vs. Decode Time Share
+
+This visualization shows the relative contribution of prefill and decode to total measured inference time for each model and workload.
+
+![Prefill vs. Decode Time Share](results/visualizations/05_phase_balance.png)
+
+### Latency Distributions
+
+The latency distributions show individual request measurements alongside violin distributions and boxplots, giving a view of both central tendency and request-level variability.
+
+![Latency Distributions](results/visualizations/06_latency_distributions.png)
+
+### Scaling Relationships
+
+These plots examine how measured prefill time changes with prompt length and how measured decode time changes with the number of generated tokens. Lines show per-model least-squares fits.
+
+![Empirical Scaling of Inference Phases](results/visualizations/07_scaling_relationships.png)
+
+### Latency Matrix
+
+The latency matrix summarizes median total request latency for every model × workload combination.
+
+![Latency Across the Benchmark Matrix](results/visualizations/08_latency_matrix.png)
+
+### Prefill vs. Decode Behavior
+
+Each point represents an individual request, showing the relationship between its measured prefill and decode times. Marker shape distinguishes the workload and color distinguishes the model.
+
+![Prefill vs. Decode Behavior](results/visualizations/09_prefill_vs_decode.png)
+
 
 ---
 
@@ -203,11 +259,22 @@ prompts.py
 
 ```text
 .
+
 ├── README.md
 ├── run_vllm.py
 ├── prompts.py
 └── results/
-    └── ...
+    └── visualizations/
+        ├── 00_benchmark_dashboard.png
+        ├── 01_phase_timing.png
+        ├── 02_total_time.png
+        ├── 03_token_lengths.png
+        ├── 04_throughput.png
+        ├── 05_phase_balance.png
+        ├── 06_latency_distributions.png
+        ├── 07_scaling_relationships.png
+        ├── 08_latency_matrix.png
+        └── 09_prefill_vs_decode.png
 ```
 
 ---
@@ -215,6 +282,9 @@ prompts.py
 ## Course
 
 **CS 601.768: Language Model Agents**
+
 Johns Hopkins University
+
 Fall 2026
+
 Instructor: **Benjamin Van Durme**
