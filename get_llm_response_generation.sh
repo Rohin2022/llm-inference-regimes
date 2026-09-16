@@ -8,7 +8,7 @@ unset HTTP_PROXY HTTPS_PROXY ALL_PROXY
 unset http_proxy https_proxy all_proxy
 
 # Start vLLM
-vllm serve /groups/bodymaps/Rohin/LMAgents/HFCache/hub/models--allenai--OLMo-2-1124-7B-Instruct/snapshots/470b1fba1ae01581f270116362ee4aa1b97f4c84 \
+vllm serve /groups/bodymaps/Rohin/LMAgents/HFCache/hub/models--allenai--OLMoE-1B-7B-0924-Instruct/snapshots/7f1c97f440f06ce36705e4f2b843edb5925f4498 \
     --host 0.0.0.0 \
     --port 8000 \
     --quantization fp8 \
@@ -50,7 +50,7 @@ echo "vLLM is ready!"
 
 python run_vllm.py \
     --csv_path crs_reports_sample_fits_olmo_window.csv \
-    --output_path results/models--allenai--OLMo-2-1124-7B-Instruct/generation.csv \
-    --llm_output_path results/models--allenai--OLMo-2-1124-7B-Instruct/generation_outputs.jsonl \
+    --output_path results/models--allenai--OLMoE-1B-7B-0924-Instruct/generation.csv \
+    --llm_output_path results/models--allenai--OLMoE-1B-7B-0924-Instruct/generation_outputs.jsonl \
     --task CREATION \
     --max_tokens 3000
